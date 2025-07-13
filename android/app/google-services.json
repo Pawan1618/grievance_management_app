@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1002662749730",
+    "project_id": "dashboardgrievance",
+    "storage_bucket": "dashboardgrievance.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002662749730:android:ef7ab73826a6b3e11f4c7b",
+        "android_client_info": {
+          "package_name": "com.example.grievance_management_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-FnF65obQSl8_5vmLO04pYznRgELAQyI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
