@@ -17,9 +17,103 @@ class _SubmitGrievanceScreenState extends State<SubmitGrievanceScreen> {
   final _formKey = GlobalKey<FormState>();
   String _title = '';
   String _description = '';
-  String _category = 'General';
+  String _category = 'Academic'; // instead of 'General'
+  String? _subCategory;
   File? _image;
-  final List<String> _categories = ['General', 'Academic', 'Hostel', 'Other'];
+  final List<String> _categories = [
+    'Academic',
+    'Hostel',
+    'Administrative',
+    'Disciplinary',
+    'Health & Safety',
+    'IT & Infrastructure',
+    'Equality & Harassment',
+    'Placement & Career',
+    'Campus Facilities',
+    'Miscellaneous',
+  ];
+
+  final Map<String, List<String>> _subCategories = {
+    'Academic': [
+      'Curriculum-related issues',
+      'Exam & Evaluation',
+      'Attendance discrepancies',
+      'Class rescheduling',
+      'Faculty behavior',
+      'Assignment or internal marks',
+      'Lab/Practical issues',
+      'Timetable conflicts',
+    ],
+    'Hostel': [
+      'Room allocation',
+      'Cleanliness & sanitation',
+      'Mess food quality',
+      'Water supply',
+      'Electricity issues',
+      'Wi-Fi/Internet problems',
+      'Wardens/Staff behavior',
+      'Maintenance requests',
+    ],
+    'Administrative': [
+      'Fees & Dues',
+      'Scholarships & Stipends',
+      'ID card or documents delay',
+      'Certificate/Transcript issues',
+      'Registration & Enrollment',
+      'Transport services',
+      'Mismanagement by office staff',
+    ],
+    'Disciplinary': [
+      'Ragging or bullying',
+      'Code of conduct violation',
+      'Harassment complaint',
+      'Unauthorized activities',
+      'Substance abuse',
+    ],
+    'Health & Safety': [
+      'Medical emergency response',
+      'Health center services',
+      'Mental health support',
+      'Safety hazards',
+      'Covid-related issues',
+    ],
+    'IT & Infrastructure': [
+      'Smart classroom issues',
+      'Projector/AV malfunction',
+      'Campus Wi-Fi problems',
+      'LMS/Portal access issues',
+      'App/Website bugs',
+      'Biometric attendance issues',
+    ],
+    'Equality & Harassment': [
+      'Gender discrimination',
+      'Caste-based issues',
+      'Disability support',
+      'Sexual harassment',
+      'Bias in evaluation',
+    ],
+    'Placement & Career': [
+      'Internship help',
+      'Placement procedure issues',
+      'Company selection bias',
+      'Resume building support',
+      'Communication gap with placement cell',
+    ],
+    'Campus Facilities': [
+      'Library services',
+      'Sports facilities',
+      'Cafeteria & canteen',
+      'Drinking water',
+      'Washroom hygiene',
+      'Parking issues',
+    ],
+    'Miscellaneous': [
+      'Lost & Found',
+      'Suggestions/Feedback',
+      'Complaint against unknown person',
+      'Others (with optional description)',
+    ],
+  };
 
   Future<void> _pickImage() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -74,7 +168,13 @@ class _SubmitGrievanceScreenState extends State<SubmitGrievanceScreen> {
                     DropdownButtonFormField<String>(
                       value: _category,
                       items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                      onChanged: (v) => setState(() => _category = v ?? 'General'),
+                      onChanged: (v) {
+                        setState(() {
+                          _category = v ?? _categories.first;
+                          final subList = _subCategories[_category];
+                          _subCategory = (subList != null && subList.isNotEmpty) ? subList.first : null;
+                        });
+                      },
                       decoration: InputDecoration(
                         labelText: 'Category',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -82,6 +182,24 @@ class _SubmitGrievanceScreenState extends State<SubmitGrievanceScreen> {
                         fillColor: Colors.grey.shade100,
                       ),
                     ),
+                    if (_subCategories[_category] != null && _subCategories[_category]!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: DropdownButtonFormField<String>(
+                          value: _subCategory ?? _subCategories[_category]!.first,
+                          items: _subCategories[_category]!
+                              .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                              .toList(),
+                          onChanged: (v) => setState(() => _subCategory = v),
+                          validator: (v) => v == null || v.isEmpty ? 'Select a subcategory' : null,
+                          decoration: InputDecoration(
+                            labelText: 'Subcategory',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            filled: true,
+                            fillColor: Colors.grey.shade100,
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 16),
                     OutlinedButton.icon(
                       onPressed: _pickImage,
@@ -128,7 +246,7 @@ class _SubmitGrievanceScreenState extends State<SubmitGrievanceScreen> {
                             id: '',
                             title: _title,
                             description: _description,
-                            category: _category,
+                            category: _category + (_subCategory != null ? ' - $_subCategory' : ''),
                             status: 'Pending',
                             imageUrl: null, // Image upload to be implemented
                             remarks: null,
