@@ -73,6 +73,10 @@ class _MyGrievancesScreenState extends State<MyGrievancesScreen> {
                             ),
                           ],
                         ),
+                        if (g.remarks != null && g.remarks!.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text('Remark: ${g.remarks!}', style: const TextStyle(color: Colors.black87)),
+                        ],
                       ],
                     ),
                     trailing: Icon(
