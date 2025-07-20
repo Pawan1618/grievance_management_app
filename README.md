@@ -3,7 +3,8 @@
 Flutter-based cross-platform grievance app using Firebase Auth, Firestore, Provider for state management, image upload, dynamic categories, real-time tracking, admin panel, and responsive Material UI.
 
 ## Getting Started
-![Grievance Screenshot](https://raw.githubusercontent.com/Pawan1618/grievance_management_app/main/lib/widgets/greie.jpg)
+<img src="https://raw.githubusercontent.com/Pawan1618/grievance_management_app/main/lib/widgets/greie.jpg" alt="Grievance Screenshot" width="400"/>
+
 
 
 
