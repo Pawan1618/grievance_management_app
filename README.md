@@ -5,9 +5,10 @@
 ## APP Images
 <p align="center">
   <img src="https://raw.githubusercontent.com/Pawan1618/grievance_management_app/main/lib/widgets/admin.jpg" alt="login" width="250" />
+  <img src="https://raw.githubusercontent.com/Pawan1618/grievance_management_app/main/lib/widgets/home.jpg" alt="Home Screen" width="250" />
   <img src="https://raw.githubusercontent.com/Pawan1618/grievance_management_app/main/lib/widgets/greie.jpg" alt="Grievance Card UI" width="250" />
   <img src="https://raw.githubusercontent.com/Pawan1618/grievance_management_app/main/lib/widgets/submit.jpg" alt="Submission Form" width="250" />
-  <img src="https://raw.githubusercontent.com/Pawan1618/grievance_management_app/main/lib/widgets/home.jpg" alt="Home Screen" width="250" />
+  
   
 </p>
 
