@@ -1,6 +1,6 @@
 # grievance_management_app
 
-Flutter-based cross-platform grievance app using Firebase Auth, Firestore, Provider for state management, image upload, dynamic categories, real-time tracking, admin panel, and responsive Material UI.
+🚀 Seamless grievance management system built with Flutter, enabling role-based login (Admin & User) using Firebase Authentication. Features include real-time tracking via Firestore, dynamic form-based grievance submission, image uploads, state management with Provider, and a responsive, modern Material 3 UI — all in a single cross-platform app.
 
 ## APP Images
 <p align="center">
