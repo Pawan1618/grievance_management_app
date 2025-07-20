@@ -52,17 +52,37 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         body: _screens[_selectedIndex],
-        bottomNavigationBar: NavigationBar(
-          backgroundColor: const Color(0xFF004d40),
-          indicatorColor: Colors.white.withOpacity(0.1),
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: (i) => setState(() => _selectedIndex = i),
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-            NavigationDestination(icon: Icon(Icons.list_alt), label: 'My Grievances'),
-            NavigationDestination(icon: Icon(Icons.add_circle), label: 'Submit'),
-            NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
-          ],
+        bottomNavigationBar: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            backgroundColor: const Color(0xFF004d40),
+            indicatorColor: Colors.white,
+            labelTextStyle: MaterialStateProperty.resolveWith<TextStyle>(
+              (Set<MaterialState> states) {
+                if (states.contains(MaterialState.selected)) {
+                  return const TextStyle(color: Colors.black, fontWeight: FontWeight.bold);
+                }
+                return const TextStyle(color: Colors.white);
+              },
+            ),
+            iconTheme: MaterialStateProperty.resolveWith<IconThemeData>(
+              (Set<MaterialState> states) {
+                if (states.contains(MaterialState.selected)) {
+                  return const IconThemeData(color: Colors.black);
+                }
+                return const IconThemeData(color: Colors.white);
+              },
+            ),
+          ),
+          child: NavigationBar(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (i) => setState(() => _selectedIndex = i),
+            destinations: const [
+              NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+              NavigationDestination(icon: Icon(Icons.list_alt), label: 'My Grievances'),
+              NavigationDestination(icon: Icon(Icons.add_circle), label: 'Submit'),
+              NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+            ],
+          ),
         ),
       ),
     );
@@ -93,6 +113,7 @@ class _HomeContentState extends State<_HomeContent> {
     final grievances = grievanceProvider.grievances;
     final total = grievances.length;
     final pending = grievances.where((g) => g.status == 'Pending').length;
+    final solved = grievances.where((g) => g.status == 'Resolved').length;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -116,6 +137,20 @@ class _HomeContentState extends State<_HomeContent> {
                         backgroundColor: Colors.blue.shade100,
                         labelStyle: TextStyle(color: Colors.blue.shade900, fontWeight: FontWeight.bold),
                         avatar: const Icon(Icons.list_alt, color: Colors.blue),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 32),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Solved', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      Chip(
+                        label: Text('$solved'),
+                        backgroundColor: Colors.green.shade100,
+                        labelStyle: TextStyle(color: Colors.green.shade900, fontWeight: FontWeight.bold),
+                        avatar: const Icon(Icons.check_circle, color: Colors.green),
                       ),
                     ],
                   ),
