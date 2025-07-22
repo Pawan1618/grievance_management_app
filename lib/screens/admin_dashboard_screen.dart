@@ -15,7 +15,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   String? _statusFilter;
   String? _categoryFilter;
   final List<String> _statuses = ['Pending', 'In Progress', 'Resolved'];
-  final List<String> _categories = ['General', 'Academic', 'Hostel', 'Other'];
+  final List<String> _categories = ['Academic',
+    'Hostel',
+    'Administrative',
+    'Disciplinary',
+    'Health & Safety',
+    'IT & Infrastructure',
+    'Equality & Harassment',
+    'Placement & Career',
+    'Campus Facilities',
+    'Miscellaneous',];
 
   Color _statusColor(String status) {
     switch (status) {
@@ -123,6 +132,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                     children: [
                                       const SizedBox(height: 4),
                                       Text(g.category, style: const TextStyle(color: Colors.black54)),
+                                      Text(g.description,style: const TextStyle(color: Colors.black)),
                                       const SizedBox(height: 8),
                                       Row(
                                         children: [
