@@ -135,11 +135,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                       Text(g.description,style: const TextStyle(color: Colors.black)),
                                       const SizedBox(height: 8),
                                       Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
                                         children: [
                                           Chip(
                                             label: Text(g.status),
-                                            backgroundColor: _statusColor(g.status).withOpacity(0.15),
-                                            labelStyle: TextStyle(color: _statusColor(g.status), fontWeight: FontWeight.bold),
+                                            backgroundColor: _statusColor(
+                                              g.status,
+                                            ).withOpacity(0.15),
+                                            labelStyle: TextStyle(
+                                              color: _statusColor(g.status),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          Text(
+                                            '${g.createdAt.day.toString().padLeft(2, '0')}-${g.createdAt.month.toString().padLeft(2, '0')}-${g.createdAt.year} ${g.createdAt.hour.toString().padLeft(2, '0')}:${g.createdAt.minute.toString().padLeft(2, '0')}',
+                                            style: const TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 12,
+                                            ),
                                           ),
                                         ],
                                       ),
