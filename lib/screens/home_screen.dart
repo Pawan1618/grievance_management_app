@@ -78,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onDestinationSelected: (i) => setState(() => _selectedIndex = i),
             destinations: const [
               NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-              NavigationDestination(icon: Icon(Icons.list_alt), label: 'My Grievances'),
+              NavigationDestination(icon: Icon(Icons.list_alt), label: 'Grievances'),
               NavigationDestination(icon: Icon(Icons.add_circle), label: 'Submit'),
               NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
             ],
@@ -130,7 +130,7 @@ class _HomeContentState extends State<_HomeContent> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Total Grievances', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text('Total', style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       Chip(
                         label: Text('$total'),
