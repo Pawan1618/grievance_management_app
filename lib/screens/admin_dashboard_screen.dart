@@ -132,6 +132,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                     children: [
                                       const SizedBox(height: 4),
                                       Text(g.category, style: const TextStyle(color: Colors.black54)),
+                                      const SizedBox(height: 4),
                                       Text(g.description,style: const TextStyle(color: Colors.black)),
                                       const SizedBox(height: 8),
                                       Row(
