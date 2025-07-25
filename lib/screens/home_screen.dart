@@ -56,17 +56,17 @@ class _HomeScreenState extends State<HomeScreen> {
           data: NavigationBarThemeData(
             backgroundColor: const Color(0xFF004d40),
             indicatorColor: Colors.white,
-            labelTextStyle: MaterialStateProperty.resolveWith<TextStyle>(
-              (Set<MaterialState> states) {
-                if (states.contains(MaterialState.selected)) {
+            labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>(
+              (Set<WidgetState> states) {
+                if (states.contains(WidgetState.selected)) {
                   return const TextStyle(color: Colors.black, fontWeight: FontWeight.bold);
                 }
                 return const TextStyle(color: Colors.white);
               },
             ),
-            iconTheme: MaterialStateProperty.resolveWith<IconThemeData>(
-              (Set<MaterialState> states) {
-                if (states.contains(MaterialState.selected)) {
+            iconTheme: WidgetStateProperty.resolveWith<IconThemeData>(
+              (Set<WidgetState> states) {
+                if (states.contains(WidgetState.selected)) {
                   return const IconThemeData(color: Colors.black);
                 }
                 return const IconThemeData(color: Colors.white);
