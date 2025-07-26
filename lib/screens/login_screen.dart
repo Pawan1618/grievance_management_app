@@ -17,6 +17,9 @@ class _LoginScreenState extends State<LoginScreen> {
   String _name = '';
   String _role = 'user';
   final List<String> _roles = ['user', 'admin'];
+  
+  // Add password visibility state
+  bool _passwordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +58,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             filled: true,
                             fillColor: Colors.grey.shade100,
                           ),
-                          onChanged: (v) => _name = v,
+                          onChanged: (v) {
+                            _name = v;
+                            authProvider.clearError();
+                          },
                           validator: (v) => v == null || v.isEmpty ? 'Enter your name' : null,
                         ),
                       if (!_isLogin) const SizedBox(height: 16),
@@ -66,7 +72,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           filled: true,
                           fillColor: Colors.grey.shade100,
                         ),
-                        onChanged: (v) => _email = v,
+                        onChanged: (v) {
+                          _email = v;
+                          authProvider.clearError();
+                        },
                         validator: (v) => v == null || !v.contains('@') ? 'Enter a valid email' : null,
                       ),
                       const SizedBox(height: 16),
@@ -76,9 +85,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           filled: true,
                           fillColor: Colors.grey.shade100,
+                          // Add suffix icon for show/hide
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _passwordVisible = !_passwordVisible;
+                              });
+                            },
+                          ),
                         ),
-                        obscureText: true,
-                        onChanged: (v) => _password = v,
+                        obscureText: !_passwordVisible,
+                        onChanged: (v) {
+                          _password = v;
+                          authProvider.clearError();
+                        },
                         validator: (v) => v == null || v.length < 6 ? 'Min 6 chars' : null,
                       ),
                       if (!_isLogin) const SizedBox(height: 16),
@@ -86,7 +109,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         DropdownButtonFormField<String>(
                           value: _role,
                           items: _roles.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
-                          onChanged: (v) => setState(() => _role = v ?? 'user'),
+                          onChanged: (v) => setState(() {
+                            _role = v ?? 'user';
+                            authProvider.clearError();
+                          }),
                           decoration: InputDecoration(
                             labelText: 'Role',
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -95,6 +121,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       const SizedBox(height: 24),
+                      if (authProvider.errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            authProvider.errorMessage!,
+                            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green.shade700,
@@ -118,7 +153,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 12),
                       TextButton(
-                        onPressed: () => setState(() => _isLogin = !_isLogin),
+                        onPressed: () {
+                          setState(() => _isLogin = !_isLogin);
+                          authProvider.clearError();
+                        },
                         child: Text(_isLogin ? 'No account? Register' : 'Have an account? Login'),
                       ),
                       if (authProvider.isLoading)
