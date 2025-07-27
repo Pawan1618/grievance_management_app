@@ -135,6 +135,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                       const SizedBox(height: 4),
                                       Text(g.description,style: const TextStyle(color: Colors.black)),
                                       const SizedBox(height: 8),
+                                      Text(g.remarks ?? '', style: const TextStyle(color: Colors.black54)),
                                       Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.end,
