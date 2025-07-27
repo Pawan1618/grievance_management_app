@@ -15,7 +15,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   String? _statusFilter;
   String? _categoryFilter;
   final List<String> _statuses = ['Pending', 'In Progress', 'Resolved'];
-  final List<String> _categories = ['Academic',
+  final List<String> _categories = [
+    'Academic',
     'Hostel',
     'Administrative',
     'Disciplinary',
@@ -24,7 +25,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     'Equality & Harassment',
     'Placement & Career',
     'Campus Facilities',
-    'Miscellaneous',];
+    'Miscellaneous',
+  ];
 
   Color _statusColor(String status) {
     switch (status) {
@@ -38,13 +40,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        Provider.of<GrievanceProvider>(
+          context,
+          listen: false,
+        ).listenToAllGrievances();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final grievanceProvider = Provider.of<GrievanceProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    grievanceProvider.listenToAllGrievances();
     final grievances = grievanceProvider.grievances.where((g) {
       final statusMatch = _statusFilter == null || g.status == _statusFilter;
-      final categoryMatch = _categoryFilter == null || g.category == _categoryFilter;
+      final categoryMatch =
+          _categoryFilter == null || g.category == _categoryFilter;
       return statusMatch && categoryMatch;
     }).toList();
     return Container(
@@ -59,7 +74,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: const Color(0xFF00695c),
-          title: const Text('Admin Dashboard', style: TextStyle(color: Colors.white)),
+          title: const Text(
+            'Admin Dashboard',
+            style: TextStyle(color: Colors.white),
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
@@ -74,7 +92,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         body: Center(
           child: Card(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             child: Padding(
               padding: const EdgeInsets.all(24.0),
@@ -86,10 +106,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         child: DropdownButtonFormField<String>(
                           value: _statusFilter,
                           hint: const Text('Status'),
-                          items: [null, ..._statuses].map((s) => DropdownMenuItem(value: s, child: Text(s ?? 'All'))).toList(),
+                          items: [null, ..._statuses]
+                              .map(
+                                (s) => DropdownMenuItem(
+                                  value: s,
+                                  child: Text(s ?? 'All'),
+                                ),
+                              )
+                              .toList(),
                           onChanged: (v) => setState(() => _statusFilter = v),
                           decoration: InputDecoration(
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             filled: true,
                             fillColor: Colors.grey.shade100,
                           ),
@@ -100,10 +129,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         child: DropdownButtonFormField<String>(
                           value: _categoryFilter,
                           hint: const Text('Category'),
-                          items: [null, ..._categories].map((c) => DropdownMenuItem(value: c, child: Text(c ?? 'All'))).toList(),
+                          items: [null, ..._categories]
+                              .map(
+                                (c) => DropdownMenuItem(
+                                  value: c,
+                                  child: Text(c ?? 'All'),
+                                ),
+                              )
+                              .toList(),
                           onChanged: (v) => setState(() => _categoryFilter = v),
                           decoration: InputDecoration(
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             filled: true,
                             fillColor: Colors.grey.shade100,
                           ),
@@ -118,23 +156,51 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         : ListView.separated(
                             padding: const EdgeInsets.all(8),
                             itemCount: grievances.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 12),
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 12),
                             itemBuilder: (context, i) {
                               final g = grievances[i];
                               return Card(
                                 elevation: 4,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
                                 child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                                  title: Text(g.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                    horizontal: 20,
+                                  ),
+                                  title: Text(
+                                    g.title,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const SizedBox(height: 4),
-                                      Text(g.category, style: const TextStyle(color: Colors.black54)),
+                                      Text(
+                                        g.category,
+                                        style: const TextStyle(
+                                          color: Colors.black54,
+                                        ),
+                                      ),
                                       const SizedBox(height: 4),
-                                      Text(g.description,style: const TextStyle(color: Colors.black)),
+                                      Text(
+                                        g.description,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                        ),
+                                      ),
                                       const SizedBox(height: 8),
+                                      Text(
+                                        g.remarks ?? '',
+                                        style: const TextStyle(
+                                          color: Colors.black54,
+                                        ),
+                                      ),
                                       Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.end,
@@ -163,7 +229,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                   ),
                                   trailing: IconButton(
                                     icon: const Icon(Icons.edit),
-                                    onPressed: () => _showStatusDialog(context, g, grievanceProvider),
+                                    onPressed: () => _showStatusDialog(
+                                      context,
+                                      g,
+                                      grievanceProvider,
+                                    ),
                                   ),
                                 ),
                               );
@@ -179,7 +249,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  void _showStatusDialog(BuildContext context, Grievance g, GrievanceProvider provider) {
+  void _showStatusDialog(
+    BuildContext context,
+    Grievance g,
+    GrievanceProvider provider,
+  ) {
     String status = g.status;
     String remarks = g.remarks ?? '';
     showDialog(
@@ -191,7 +265,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           children: [
             DropdownButtonFormField<String>(
               value: status,
-              items: _statuses.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+              items: _statuses
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
               onChanged: (v) => status = v ?? g.status,
               decoration: const InputDecoration(labelText: 'Status'),
             ),
@@ -209,7 +285,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              await provider.updateGrievanceStatus(g.id, status, remarks: remarks);
+              await provider.updateGrievanceStatus(
+                g.id,
+                status,
+                remarks: remarks,
+              );
               if (context.mounted) Navigator.pop(ctx);
             },
             child: const Text('Update'),
@@ -218,4 +298,4 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       ),
     );
   }
-} 
+}
