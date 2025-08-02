@@ -14,9 +14,11 @@ class FirestoreService {
         .where('userId', isEqualTo: userId)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Grievance.fromMap(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Grievance.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Stream<List<Grievance>> getAllGrievances() {
@@ -24,15 +26,28 @@ class FirestoreService {
         .collection('grievances')
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Grievance.fromMap(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Grievance.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
-  Future<void> updateGrievanceStatus(String id, String status, {String? remarks}) async {
+  Future<void> updateGrievance(
+    String grievanceId,
+    Map<String, dynamic> data,
+  ) async {
+    await _db.collection('grievances').doc(grievanceId).update(data);
+  }
+
+  Future<void> updateGrievanceStatus(
+    String id,
+    String status, {
+    String? remarks,
+  }) async {
     await _db.collection('grievances').doc(id).update({
       'status': status,
       if (remarks != null) 'remarks': remarks,
     });
   }
-} 
+}
