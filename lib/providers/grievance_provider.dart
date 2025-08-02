@@ -30,11 +30,19 @@ class GrievanceProvider extends ChangeNotifier {
     });
   }
 
+  Future<void> updateRating(String grievanceId, int rating) async {
+    await _firestoreService.updateGrievance(grievanceId, {'rating': rating});
+  }
+
   Future<void> addGrievance(Grievance grievance) async {
     await _firestoreService.addGrievance(grievance);
   }
 
-  Future<void> updateGrievanceStatus(String id, String status, {String? remarks}) async {
+  Future<void> updateGrievanceStatus(
+    String id,
+    String status, {
+    String? remarks,
+  }) async {
     await _firestoreService.updateGrievanceStatus(id, status, remarks: remarks);
   }
-} 
+}
