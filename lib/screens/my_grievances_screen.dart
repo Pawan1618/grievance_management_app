@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/grievance_provider.dart';
-import '../models/grievance_model.dart';
 
 class MyGrievancesScreen extends StatefulWidget {
   const MyGrievancesScreen({super.key});
@@ -17,7 +16,10 @@ class _MyGrievancesScreenState extends State<MyGrievancesScreen> {
     super.didChangeDependencies();
     final user = Provider.of<AuthProvider>(context, listen: false).user;
     if (user != null) {
-      Provider.of<GrievanceProvider>(context, listen: false).listenToUserGrievances(user.id);
+      Provider.of<GrievanceProvider>(
+        context,
+        listen: false,
+      ).listenToUserGrievances(user.id);
     }
   }
 
@@ -54,28 +56,82 @@ class _MyGrievancesScreenState extends State<MyGrievancesScreen> {
                 final g = grievances[i];
                 return Card(
                   elevation: 4,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                    title: Text(g.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 20,
+                    ),
+                    title: Text(
+                      g.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 4),
-                        Text(g.category, style: const TextStyle(color: Colors.black54)),
+                        Text(
+                          g.category,
+                          style: const TextStyle(color: Colors.black54),
+                        ),
                         const SizedBox(height: 8),
                         Row(
                           children: [
                             Chip(
                               label: Text(g.status),
-                              backgroundColor: _statusColor(g.status).withOpacity(0.15),
-                              labelStyle: TextStyle(color: _statusColor(g.status), fontWeight: FontWeight.bold),
+                              backgroundColor: _statusColor(
+                                g.status,
+                              ).withOpacity(0.15),
+                              labelStyle: TextStyle(
+                                color: _statusColor(g.status),
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
                         if (g.remarks != null && g.remarks!.isNotEmpty) ...[
                           const SizedBox(height: 8),
-                          Text('Remark: ${g.remarks!}', style: const TextStyle(color: Colors.black87)),
+                          Text(
+                            'Remark: ${g.remarks!}',
+                            style: const TextStyle(color: Colors.black87),
+                          ),
+                        ],
+                        if (g.status == 'Resolved') ... [
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Text(
+                                'Rate: ',
+                                style: TextStyle(color: Colors.black54),
+                              ),
+                            ...List.generate(
+                              5,
+                              (index) => GestureDetector(
+                                onTap: () {
+                                  final grievanceProvider =
+                                      Provider.of<GrievanceProvider>(
+                                        context,
+                                        listen: false,
+                                      );
+                                  grievanceProvider.updateRating(
+                                    g.id,
+                                    index + 1,
+                                  );
+                                },
+                                child: Icon(
+                                  // If rating exists and is greater than index, show filled star
+                                  g.rating != null && g.rating! > index
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         ],
                       ],
                     ),
@@ -83,8 +139,8 @@ class _MyGrievancesScreenState extends State<MyGrievancesScreen> {
                       g.status == 'Resolved'
                           ? Icons.check_circle
                           : g.status == 'In Progress'
-                              ? Icons.timelapse
-                              : Icons.pending,
+                          ? Icons.timelapse
+                          : Icons.pending,
                       color: _statusColor(g.status),
                     ),
                   ),
@@ -93,4 +149,4 @@ class _MyGrievancesScreenState extends State<MyGrievancesScreen> {
             ),
     );
   }
-} 
+}
