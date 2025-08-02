@@ -10,6 +10,7 @@ class Grievance {
   final String? remarks;
   final String userId;
   final DateTime createdAt;
+  final int? rating;
 
   Grievance({
     required this.id,
@@ -21,6 +22,7 @@ class Grievance {
     this.remarks,
     required this.userId,
     required this.createdAt,
+    this.rating,
   });
 
   factory Grievance.fromMap(Map<String, dynamic> map, String id) {
@@ -34,6 +36,7 @@ class Grievance {
       remarks: map['remarks'],
       userId: map['userId'] ?? '',
       createdAt: (map['createdAt'] as Timestamp).toDate(),
+      rating: map['rating'],
     );
   }
 
@@ -47,6 +50,7 @@ class Grievance {
       'remarks': remarks,
       'userId': userId,
       'createdAt': createdAt,
+      'rating': rating,
     };
   }
-} 
+}
