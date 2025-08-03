@@ -33,6 +33,10 @@ class AuthService {
     await _auth.signOut();
   }
 
+  Future<void> updateUser(String userId, Map<String, dynamic> data) async {
+    await _db.collection('users').doc(userId).update(data);
+  }
+
   Future<AppUser?> getCurrentUser() async {
     final user = _auth.currentUser;
     if (user != null) {
