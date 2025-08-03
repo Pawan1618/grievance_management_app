@@ -58,6 +58,80 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateAcademicDetails(String userId, {
+    String? regNumber,
+    String? course,
+    String? currentYear,
+    String? section,
+    String? cgpa,
+  }) async {
+    try {
+      await _authService.updateUser(userId, {
+        if (regNumber != null) 'regNumber': regNumber,
+        if (course != null) 'course': course,
+        if (currentYear != null) 'currentYear': currentYear,
+        if (section != null) 'section': section,
+        if (cgpa != null) 'cgpa': cgpa,
+      });
+      // Update local user object
+      if (_user != null) {
+        _user = AppUser(
+          id: _user!.id,
+          name: _user!.name,
+          email: _user!.email,
+          role: _user!.role,
+          regNumber: regNumber ?? _user!.regNumber,
+          course: course ?? _user!.course,
+          currentYear: currentYear ?? _user!.currentYear,
+          section: section ?? _user!.section,
+          cgpa: cgpa ?? _user!.cgpa,
+          phone: _user!.phone,
+          address: _user!.address,
+        );
+        notifyListeners();
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to update academic details: ${e.toString()}';
+      notifyListeners();
+      throw e;
+    }
+  }
+
+  Future<void> updatePersonalDetails(String userId, {
+    String? name,
+    String? phone,
+    String? address,
+  }) async {
+    try {
+      await _authService.updateUser(userId, {
+        if (name != null) 'name': name,
+        if (phone != null) 'phone': phone,
+        if (address != null) 'address': address,
+      });
+      // Update local user object
+      if (_user != null) {
+        _user = AppUser(
+          id: _user!.id,
+          name: name ?? _user!.name,
+          email: _user!.email,
+          role: _user!.role,
+          regNumber: _user!.regNumber,
+          course: _user!.course,
+          currentYear: _user!.currentYear,
+          section: _user!.section,
+          cgpa: _user!.cgpa,
+          phone: phone ?? _user!.phone,
+          address: address ?? _user!.address,
+        );
+        notifyListeners();
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to update personal details: ${e.toString()}';
+      notifyListeners();
+      throw e;
+    }
+  }
+
   Future<void> loadCurrentUser() async {
     _user = await _authService.getCurrentUser();
     notifyListeners();
