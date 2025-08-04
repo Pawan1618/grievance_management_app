@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/grievance_provider.dart';
 import '../models/grievance_model.dart';
 import '../providers/auth_provider.dart';
+import 'grievance_details_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -194,8 +195,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                           color: Colors.black,
                                         ),
                                       ),
-                                      const SizedBox(height: 8),
+                                      const SizedBox(height: 10),
                                       Text(g.remarks ?? '', style: const TextStyle(color: Colors.black54)),
+                                      const SizedBox(height: 10),
                                       Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.end,
@@ -219,6 +221,24 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                             ),
                                           ),
                                         ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: TextButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => GrievanceDetailsScreen(
+                                                  grievance: g,
+                                                  onStatusUpdate: (status, remarks) => _showStatusDialog(context, g, grievanceProvider),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: const Text('View Details'),
+                                        ),
                                       ),
                                     ],
                                   ),
