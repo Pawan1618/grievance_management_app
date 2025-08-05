@@ -16,7 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String _password = '';
   String _name = '';
   String _role = 'user';
-  final List<String> _roles = ['user', 'admin'];
+  final List<String> _roles = ['user'];
   
   // Add password visibility state
   bool _passwordVisible = false;
