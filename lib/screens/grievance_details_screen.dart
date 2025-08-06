@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/grievance_model.dart';
+import '../models/user_model.dart';
 
-class GrievanceDetailsScreen extends StatelessWidget {
+class GrievanceDetailsScreen extends StatefulWidget {
   final Grievance grievance;
   final Function(String status, String remarks)? onStatusUpdate;
 
@@ -10,6 +12,114 @@ class GrievanceDetailsScreen extends StatelessWidget {
     required this.grievance,
     this.onStatusUpdate,
   });
+
+  @override
+  State<GrievanceDetailsScreen> createState() => _GrievanceDetailsScreenState();
+}
+
+class _GrievanceDetailsScreenState extends State<GrievanceDetailsScreen> {
+  AppUser? studentDetails;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStudentDetails();
+  }
+
+  Future<void> _loadStudentDetails() async {
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.grievance.userId)
+          .get();
+      
+      if (userDoc.exists) {
+        setState(() {
+          studentDetails = AppUser.fromMap(
+            userDoc.data() as Map<String, dynamic>,
+            userDoc.id,
+          );
+        });
+      }
+    } catch (e) {
+      print('Error loading student details: $e');
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  Widget _buildAcademicDetails() {
+    if (isLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (studentDetails == null) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: Text('Student details not available'),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Student Details',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF00695c),
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildInfoRow('Name', studentDetails!.name),
+        _buildInfoRow('Registration No.', studentDetails!.regNumber ?? 'N/A'),
+        _buildInfoRow('Course', studentDetails!.course ?? 'N/A'),
+        _buildInfoRow('Year', studentDetails!.currentYear ?? 'N/A'),
+        _buildInfoRow('Section', studentDetails!.section ?? 'N/A'),
+        if (studentDetails!.cgpa != null)
+          _buildInfoRow('CGPA', studentDetails!.cgpa!),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black54,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 15,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +131,10 @@ class GrievanceDetailsScreen extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          if (onStatusUpdate != null)
+          if (widget.onStatusUpdate != null)
             IconButton(
               icon: const Icon(Icons.edit, color: Colors.white),
-              onPressed: () => onStatusUpdate?.call(grievance.status, grievance.remarks ?? ''),
+              onPressed: () => widget.onStatusUpdate?.call(widget.grievance.status, widget.grievance.remarks ?? ''),
             ),
         ],
       ),
@@ -50,30 +160,32 @@ class GrievanceDetailsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                    grievance.title,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF00695c),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      _buildInfoChip(Icons.category, grievance.category),
-                      const SizedBox(width: 12),
-                      _buildInfoChip(
-                        Icons.pending_actions,
-                        grievance.status,
-                        color: _getStatusColor(grievance.status),
+                      widget.grievance.title,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF00695c),
                       ),
-                    ],
-                  ),
-                  const Divider(height: 32),
-                  _buildDetailRow('Description', grievance.description),
-                  if (grievance.remarks != null && grievance.remarks!.isNotEmpty) ...[
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        _buildInfoChip(Icons.category, widget.grievance.category),
+                        const SizedBox(width: 12),
+                        _buildInfoChip(
+                          Icons.pending_actions,
+                          widget.grievance.status,
+                          color: _getStatusColor(widget.grievance.status),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 32),
+                    _buildAcademicDetails(),
+                    const Divider(height: 32),
+                    _buildDetailRow('Description', widget.grievance.description),
+                  if (widget.grievance.remarks != null && widget.grievance.remarks!.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    _buildDetailRow('Remarks', grievance.remarks!),
+                    _buildDetailRow('Remarks', widget.grievance.remarks!),
                   ],
                   const Divider(height: 32),
                   Row(
@@ -91,14 +203,14 @@ class GrievanceDetailsScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${grievance.createdAt.day.toString().padLeft(2, '0')}-${grievance.createdAt.month.toString().padLeft(2, '0')}-${grievance.createdAt.year}',
+                            '${widget.grievance.createdAt.day.toString().padLeft(2, '0')}-${widget.grievance.createdAt.month.toString().padLeft(2, '0')}-${widget.grievance.createdAt.year}',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                           Text(
-                            '${grievance.createdAt.hour.toString().padLeft(2, '0')}:${grievance.createdAt.minute.toString().padLeft(2, '0')}',
+                            '${widget.grievance.createdAt.hour.toString().padLeft(2, '0')}:${widget.grievance.createdAt.minute.toString().padLeft(2, '0')}',
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black87,
@@ -106,7 +218,7 @@ class GrievanceDetailsScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      if (grievance.rating != null)
+                      if (widget.grievance.rating != null)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -122,7 +234,7 @@ class GrievanceDetailsScreen extends StatelessWidget {
                               children: List.generate(
                                 5,
                                 (index) => Icon(
-                                  index < grievance.rating! ? Icons.star : Icons.star_border,
+                                  index < widget.grievance.rating! ? Icons.star : Icons.star_border,
                                   color: Colors.amber,
                                   size: 20,
                                 ),
