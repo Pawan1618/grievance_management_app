@@ -81,9 +81,30 @@ class _MyGrievancesScreenState extends State<MyGrievancesScreen> {
                         vertical: 16,
                         horizontal: 20,
                       ),
-                      title: Text(
-                        g.title,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              g.title,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'Ref ID: ${g.referenceId}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue.shade800,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,10 +113,6 @@ class _MyGrievancesScreenState extends State<MyGrievancesScreen> {
                           Text(
                             g.category,
                             style: const TextStyle(color: Colors.black54),
-                          ),
-                          Text(
-                            g.referenceId.toString(),
-                            style: const TextStyle(color: Color.fromARGB(255, 20, 105, 251)),
                           ),
                           const SizedBox(height: 8),
                           Row(
