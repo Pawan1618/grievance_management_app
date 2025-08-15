@@ -38,115 +38,136 @@ class _MyGrievancesScreenState extends State<MyGrievancesScreen> {
   Widget build(BuildContext context) {
     final grievanceProvider = Provider.of<GrievanceProvider>(context);
     final grievances = grievanceProvider.grievances;
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFFe3f2fd), Color(0xFFb2ebf2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          grievanceProvider.listenToAllGrievances();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Loading all grievances...'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        },
+        backgroundColor: Colors.blue.shade600,
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.list_alt),
+        tooltip: 'View All Grievances',
       ),
-      child: grievances.isEmpty
-          ? const Center(child: Text('No grievances submitted.'))
-          : ListView.separated(
-              padding: const EdgeInsets.all(24),
-              itemCount: grievances.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, i) {
-                final g = grievances[i];
-                return Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 20,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFe3f2fd), Color(0xFFb2ebf2)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: grievances.isEmpty
+            ? const Center(child: Text('No grievances submitted.'))
+            : ListView.separated(
+                padding: const EdgeInsets.all(24),
+                itemCount: grievances.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, i) {
+                  final g = grievances[i];
+                  return Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
                     ),
-                    title: Text(
-                      g.title,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Text(
-                          g.category,
-                          style: const TextStyle(color: Colors.black54),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Chip(
-                              label: Text(g.status),
-                              backgroundColor: _statusColor(
-                                g.status,
-                              ).withOpacity(0.15),
-                              labelStyle: TextStyle(
-                                color: _statusColor(g.status),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (g.remarks != null && g.remarks!.isNotEmpty) ...[
-                          const SizedBox(height: 8),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 20,
+                      ),
+                      title: Text(
+                        g.title,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 4),
                           Text(
-                            'Remark: ${g.remarks!}',
-                            style: const TextStyle(color: Colors.black87),
+                            g.category,
+                            style: const TextStyle(color: Colors.black54),
                           ),
-                        ],
-                        if (g.status == 'Resolved') ... [
+                          Text(
+                            g.referenceId.toString(),
+                            style: const TextStyle(color: Color.fromARGB(255, 20, 105, 251)),
+                          ),
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              Text(
-                                'Rate: ',
-                                style: TextStyle(color: Colors.black54),
+                              Chip(
+                                label: Text(g.status),
+                                backgroundColor: _statusColor(
+                                  g.status,
+                                ).withOpacity(0.15),
+                                labelStyle: TextStyle(
+                                  color: _statusColor(g.status),
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ...List.generate(
-                              5,
-                              (index) => GestureDetector(
-                                onTap: () {
-                                  final grievanceProvider =
-                                      Provider.of<GrievanceProvider>(
+                            ],
+                          ),
+                          if (g.remarks != null && g.remarks!.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              'Remark: ${g.remarks!}',
+                              style: const TextStyle(color: Colors.black87),
+                            ),
+                          ],
+                          if (g.status == 'Resolved') ...[
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Text(
+                                  'Rate: ',
+                                  style: TextStyle(color: Colors.black54),
+                                ),
+                                ...List.generate(
+                                  5,
+                                  (index) => GestureDetector(
+                                    onTap: () {
+                                      final grievanceProvider =
+                                          Provider.of<GrievanceProvider>(
                                         context,
                                         listen: false,
                                       );
-                                  grievanceProvider.updateRating(
-                                    g.id,
-                                    index + 1,
-                                  );
-                                },
-                                child: Icon(
-                                  // If rating exists and is greater than index, show filled star
-                                  g.rating != null && g.rating! > index
-                                      ? Icons.star
-                                      : Icons.star_border,
-                                  color: Colors.amber,
-                                  size: 20,
+                                      grievanceProvider.updateRating(
+                                        g.id,
+                                        index + 1,
+                                      );
+                                    },
+                                    child: Icon(
+                                      g.rating != null && g.rating! > index
+                                          ? Icons.star
+                                          : Icons.star_border,
+                                      color: Colors.amber,
+                                      size: 20,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                           ],
-                        ),
                         ],
-                      ],
+                      ),
+                      trailing: Icon(
+                        g.status == 'Resolved'
+                            ? Icons.check_circle
+                            : g.status == 'In Progress'
+                                ? Icons.timelapse
+                                : Icons.pending,
+                        color: _statusColor(g.status),
+                      ),
                     ),
-                    trailing: Icon(
-                      g.status == 'Resolved'
-                          ? Icons.check_circle
-                          : g.status == 'In Progress'
-                          ? Icons.timelapse
-                          : Icons.pending,
-                      color: _statusColor(g.status),
-                    ),
-                  ),
-                );
-              },
-            ),
+                  );
+                },
+              ),
+      ),
     );
   }
 }
