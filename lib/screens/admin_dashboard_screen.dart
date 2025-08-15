@@ -15,6 +15,8 @@ class AdminDashboardScreen extends StatefulWidget {
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   String? _statusFilter;
   String? _categoryFilter;
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
   final List<String> _statuses = ['Pending', 'In Progress', 'Resolved'];
   final List<String> _categories = [
     'Academic',
@@ -54,14 +56,24 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final grievanceProvider = Provider.of<GrievanceProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final grievances = grievanceProvider.grievances.where((g) {
       final statusMatch = _statusFilter == null || g.status == _statusFilter;
-      final categoryMatch =
-          _categoryFilter == null || g.category == _categoryFilter;
-      return statusMatch && categoryMatch;
+      final categoryMatch = _categoryFilter == null || 
+          g.category.startsWith(_categoryFilter!);
+      final searchMatch = _searchQuery.isEmpty || 
+          g.referenceId.toString().contains(_searchQuery) ||
+          g.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          g.description.toLowerCase().contains(_searchQuery.toLowerCase());
+      return statusMatch && categoryMatch && searchMatch;
     }).toList();
     return Container(
       decoration: const BoxDecoration(
@@ -101,6 +113,36 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 children: [
+                  // Search Bar
+                  TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search by Reference ID, Title, or Description...',
+                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear, color: Colors.grey),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  _searchQuery = '';
+                                });
+                              },
+                            )
+                          : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey.shade100,
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
@@ -152,108 +194,157 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   ),
                   const SizedBox(height: 16),
                   Expanded(
-                    child: grievances.isEmpty
-                        ? const Center(child: Text('No grievances found.'))
-                        : ListView.separated(
-                            padding: const EdgeInsets.all(8),
-                            itemCount: grievances.length,
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(height: 12),
-                            itemBuilder: (context, i) {
-                              final g = grievances[i];
-                              return Card(
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                    horizontal: 20,
-                                  ),
-                                  title: Text(
-                                    g.title,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
+                    child: grievanceProvider.isLoading
+                        ? const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(),
+                                SizedBox(height: 16),
+                                Text('Loading grievances...'),
+                              ],
+                            ),
+                          )
+                        : grievances.isEmpty
+                            ? const Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'No grievances found.',
+                                      style: TextStyle(fontSize: 18, color: Colors.grey),
                                     ),
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        g.category,
-                                        style: const TextStyle(
-                                          color: Colors.black54,
-                                        ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      'Try adjusting your filters or check back later.',
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : ListView.separated(
+                                padding: const EdgeInsets.all(8),
+                                itemCount: grievances.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 12),
+                                itemBuilder: (context, i) {
+                                  final g = grievances[i];
+                                  return Card(
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18),
+                                    ),
+                                    child: ListTile(
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                        horizontal: 20,
                                       ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        g.description,
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text(g.remarks ?? '', style: const TextStyle(color: Colors.black54)),
-                                      const SizedBox(height: 12),
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
+                                      title: Row(
                                         children: [
-                                          Chip(
-                                            label: Text(g.status),
-                                            backgroundColor: _statusColor(
-                                              g.status,
-                                            ).withOpacity(0.15),
-                                            labelStyle: TextStyle(
-                                              color: _statusColor(g.status),
-                                              fontWeight: FontWeight.bold,
+                                          Expanded(
+                                            child: Text(
+                                              g.title,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                          const Spacer(),
-                                          Text(
-                                            '${g.createdAt.day.toString().padLeft(2, '0')}-${g.createdAt.month.toString().padLeft(2, '0')}-${g.createdAt.year} ${g.createdAt.hour.toString().padLeft(2, '0')}:${g.createdAt.minute.toString().padLeft(2, '0')}',
-                                            style: const TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 12,
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue.shade100,
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              'Ref: ${g.referenceId}',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.blue.shade800,
+                                              ),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 8),
-                                      Align(
-                                        alignment: Alignment.centerRight,
-                                        child: TextButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => GrievanceDetailsScreen(
-                                                  grievance: g,
-                                                  onStatusUpdate: (status, remarks) => _showStatusDialog(context, g, grievanceProvider),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            g.category,
+                                            style: const TextStyle(
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            g.description,
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Text(g.remarks ?? '', style: const TextStyle(color: Colors.black54)),
+                                          const SizedBox(height: 12),
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              Chip(
+                                                label: Text(g.status),
+                                                backgroundColor: _statusColor(
+                                                  g.status,
+                                                ).withOpacity(0.15),
+                                                labelStyle: TextStyle(
+                                                  color: _statusColor(g.status),
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                            );
-                                          },
-                                          child: const Text('View Details'),
+                                              const Spacer(),
+                                              Text(
+                                                '${g.createdAt.day.toString().padLeft(2, '0')}-${g.createdAt.month.toString().padLeft(2, '0')}-${g.createdAt.year} ${g.createdAt.hour.toString().padLeft(2, '0')}:${g.createdAt.minute.toString().padLeft(2, '0')}',
+                                                style: const TextStyle(
+                                                  color: Colors.black54,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: TextButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => GrievanceDetailsScreen(
+                                                      grievance: g,
+                                                      onStatusUpdate: (status, remarks) => _showStatusDialog(context, g, grievanceProvider),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: const Text('View Details'),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      trailing: IconButton(
+                                        icon: const Icon(Icons.edit),
+                                        onPressed: () => _showStatusDialog(
+                                          context,
+                                          g,
+                                          grievanceProvider,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () => _showStatusDialog(
-                                      context,
-                                      g,
-                                      grievanceProvider,
                                     ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                                  );
+                                },
+                              ),
                   ),
                 ],
               ),
