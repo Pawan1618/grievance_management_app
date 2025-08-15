@@ -115,6 +115,10 @@ class _MyGrievancesScreenState extends State<MyGrievancesScreen> {
                             style: const TextStyle(color: Colors.black54),
                           ),
                           const SizedBox(height: 8),
+                          Text(
+                            g.description,
+                            style: const TextStyle(color: Colors.black87),
+                          ),
                           Row(
                             children: [
                               Chip(
