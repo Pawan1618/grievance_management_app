@@ -38,6 +38,34 @@ class GrievanceProvider extends ChangeNotifier {
     await _firestoreService.addGrievance(grievance);
   }
 
+  Future<int> getNextReferenceId() async {
+    return _firestoreService.getNextGrievanceReferenceId();
+  }
+
+  Future<void> createAndAddGrievance({
+    required String title,
+    required String description,
+    required String category,
+    required String userId,
+    String? imageUrl,
+    String? remarks,
+  }) async {
+    final nextRefId = await _firestoreService.getNextGrievanceReferenceId();
+    final grievance = Grievance(
+      id: '',
+      title: title,
+      description: description,
+      category: category,
+      status: 'Pending',
+      imageUrl: imageUrl,
+      remarks: remarks,
+      userId: userId,
+      createdAt: DateTime.now(),
+      referenceId: nextRefId,
+    );
+    await _firestoreService.addGrievance(grievance);
+  }
+
   Future<void> updateGrievanceStatus(
     String id,
     String status, {
