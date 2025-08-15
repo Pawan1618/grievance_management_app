@@ -11,6 +11,7 @@ class Grievance {
   final String userId;
   final DateTime createdAt;
   final int? rating;
+  final int referenceId;
 
   Grievance({
     required this.id,
@@ -23,6 +24,7 @@ class Grievance {
     required this.userId,
     required this.createdAt,
     this.rating,
+    required this.referenceId,
   });
 
   factory Grievance.fromMap(Map<String, dynamic> map, String id) {
@@ -37,6 +39,9 @@ class Grievance {
       userId: map['userId'] ?? '',
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       rating: map['rating'],
+      referenceId: (map['referenceId'] is int)
+          ? map['referenceId'] as int
+          : int.tryParse(map['referenceId']?.toString() ?? '') ?? 0,
     );
   }
 
@@ -51,6 +56,7 @@ class Grievance {
       'userId': userId,
       'createdAt': createdAt,
       'rating': rating,
+      'referenceId': referenceId,
     };
   }
 }
