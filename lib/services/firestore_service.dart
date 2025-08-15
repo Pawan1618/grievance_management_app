@@ -4,6 +4,26 @@ import '../models/grievance_model.dart';
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  Future<int> getNextGrievanceReferenceId() async {
+    final DocumentReference counterRef = _db.collection('counters').doc('grievance_reference');
+    return _db.runTransaction<int>((transaction) async {
+      final snapshot = await transaction.get(counterRef);
+      int last = 1000;
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        final value = data['last'];
+        if (value is int) {
+          last = value;
+        } else if (value is String) {
+          last = int.tryParse(value) ?? 1000;
+        }
+      }
+      final next = last + 1; // first will be 1001
+      transaction.set(counterRef, {'last': next}, SetOptions(merge: true));
+      return next;
+    });
+  }
+
   Future<void> addGrievance(Grievance grievance) async {
     await _db.collection('grievances').add(grievance.toMap());
   }
