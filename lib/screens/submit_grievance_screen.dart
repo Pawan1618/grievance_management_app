@@ -242,20 +242,25 @@ class _SubmitGrievanceScreenState extends State<SubmitGrievanceScreen> {
                       ),
                       onPressed: () async {
                         if (_formKey.currentState!.validate() && user != null) {
+                          final category = _category + (_subCategory != null ? ' - $_subCategory' : '');
+                          final nextRefId = await grievanceProvider.getNextReferenceId();
                           final grievance = Grievance(
                             id: '',
                             title: _title,
                             description: _description,
-                            category: _category + (_subCategory != null ? ' - $_subCategory' : ''),
+                            category: category,
                             status: 'Pending',
                             imageUrl: null, // Image upload to be implemented
                             remarks: null,
                             userId: user.id,
                             createdAt: DateTime.now(),
+                            referenceId: nextRefId,
                           );
                           await grievanceProvider.addGrievance(grievance);
                           if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Grievance submitted!')));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Grievance submitted! Ref ID: $nextRefId')),
+                            );
                             _formKey.currentState!.reset();
                             setState(() => _image = null);
                           }
